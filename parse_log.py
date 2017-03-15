@@ -15,7 +15,7 @@ UNIT_NUM_PER_ROW = CAPACITY / (BANK_NUM * ROW_NUM * UNIT_SIZE)
 CHUNK_SIZE = 32
 
 # REMAP parameter
-'''
+
 # remap params of proposed scheme
 REMAP_PARAMS = [
 			0,	0,	0,	0,	0,	0,	0,	0 ,
@@ -51,8 +51,8 @@ REMAP_PARAMS = [
 			30,	29,	22,	18,	14,	10,	6,	2 ,
 			31,	26,	27,	25,	23,	21,	19,	17,
 		]
-'''
 
+'''
 # remap params of patent
 REMAP_PARAMS = [
 			0,	0,	0,	0,	0,	0,	0,	0 ,
@@ -88,7 +88,7 @@ REMAP_PARAMS = [
 			30,	29,	27,	23,	15,	10,	6,	18,
 			31,	31,	31,	31,	31,	21,	19,	25,
 		]
-
+'''
 def read_log(log_file):
 	#pattern = re.compile(r'Row\s(\d+)\s:\s((\(\d+[,]\d+[,]\d+\))+)')
 	#pattern = re.compile(r'Row\s(\d+)\s:\s((\(\d+\,\s\d+\,\s\d+\))+)')
@@ -176,7 +176,7 @@ class AddressChunk():
 			for word_index in range(UNIT_SIZE / (CHIP_NUM * 8)):
 				for row_index in range(CHUNK_SIZE):
 					error_num = len(self.get_remapped_error_in_word(row_index, unit_index, word_index))
-					if error_num in error_hist.keys():
+					if error_hist.has_key(error_num):
 						error_hist[error_num] += 1
 					else:
 						error_hist[error_num] = 1
@@ -198,7 +198,7 @@ class AddressChunk():
 if __name__ == "__main__":
 	chunk_list = []
 	
-	error_dict = read_log('log_files/log_samsung_2G_1600_A_modi_print_new_170313_test7 (6)')
+	error_dict = read_log('log_files/log_hynix_4G_1600_C_moid_print_new_173014_test1')
 	
 	row_num = max(error_dict.keys())
 	print row_num
