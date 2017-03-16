@@ -9,7 +9,7 @@ from mapper import Mapper
 # main function
 if __name__ == "__main__":
 	# read log and create error_dict
-	error_dict = read_log('log_files/log_samsung_2G_1600_A_modi_print_new_170313_test7 (6)')
+	error_dict = read_log('log_files/log_samsung_2G_1600_A_modi_print_new_170313_test7')
 	# get number of rows in log
 	max_row_num = max(error_dict.keys())
 	print max_row_num

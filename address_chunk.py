@@ -1,4 +1,5 @@
 from copy import deepcopy
+from operator import add
 
 # import user modules
 from utils import PARAMS
@@ -56,6 +57,17 @@ class AddressChunk():
 						error_hist[error_num] = 1
 		return error_hist
 
+	def get_double_error_in_word(self):
+		error_list = []
+		for unit_index in range(len(self.__remapped_error_list)):
+			for word_index in range(PARAMS['unit_size'] / (PARAMS['chip_num'] * 8)):
+				for row_index in range(PARAMS['chunk_size']):
+					error_in_word = self.get_error_in_word(row_index, unit_index, word_index)
+					error_num = len(error_in_word)
+					if error_num >= 2:
+						error_list.append(error_in_word)
+		return error_list
+
 	def get_remapped_error_in_word_hist(self):
 		error_hist = {}
 		for unit_index in range(len(self.__remapped_error_list)):
@@ -106,7 +118,7 @@ class ChunkList():
 		'''
 		# for test, enable remap without verification
 		for chunk in self.__chunk_list:
-				chunk.remap(mapper.get_remap_params())
+			chunk.remap(mapper.get_remap_params())
 
 	def get_error_in_word_hist(self):
 		error_hist = {}
@@ -117,6 +129,12 @@ class ChunkList():
 				else:
 					error_hist[error_num]  = freq
 		return error_hist
+
+	def get_double_error_in_word(self):
+		error_list = []
+		for chunk in self.__chunk_list:
+			error_list += chunk.get_double_error_in_word()
+		return error_list
 
 	def get_remapped_error_in_word_hist(self):
 		error_hist = {}
