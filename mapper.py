@@ -40,3 +40,7 @@ class Mapper():
 
 	def get_remap_params(self):
 		return self.__remap_params
+
+
+def generate_mapper():
+	

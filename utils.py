@@ -16,22 +16,8 @@ def unit_num_per_row(params):
 
 PARAMS['unit_num'] = unit_num_per_row(PARAMS)
 
-'''
-CHIP_NUM = 8
-CAPACITY = 2 ** 34 # 16Gb
-BANK_NUM = 2 ** 3
-ROW_NUM  = 2 ** 15
-
-# unit size
-UNIT_SIZE = 2 ** 9
-UNIT_NUM_PER_ROW = CAPACITY / (BANK_NUM * ROW_NUM * UNIT_SIZE)
-
-# chunk size
-CHUNK_SIZE = 32
-'''
 
 import re
-
 def read_log(log_file):
 	#pattern = re.compile(r'Row\s(\d+)\s:\s((\(\d+[,]\d+[,]\d+\))+)')
 	#pattern = re.compile(r'Row\s(\d+)\s:\s((\(\d+\,\s\d+\,\s\d+\))+)')
