@@ -41,6 +41,7 @@ class Mapper():
 	def get_remap_params(self):
 		return self.__remap_params
 
-
-def generate_mapper():
-	
+	def generate_params(self):
+		neighbor_dict = {}
+		for row_index in range(self.__chunk_size):
+			neighbor_dict[row_index] = 
