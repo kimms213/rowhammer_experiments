@@ -11,6 +11,8 @@ class Mapper():
 			lines = file.readlines()
 			for line in lines:
 				line = line.split(',')
+				if len(line) == 1:
+					line = line[0].split('\t')
 				for param in line:
 					self.__remap_params.append(int(param))
 				#params_list = map(lambda x: int(x), line)

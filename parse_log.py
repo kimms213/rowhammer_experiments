@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
 	# create mapper
 	mapper = Mapper(PARAMS['chip_num'], PARAMS['chunk_size'])
-	mapper.set_params_from_csv('mapping_files/proposed.map')
+	mapper.set_params_from_csv('mapping_files/proposed_ver2.map')
 	print mapper.verify()
 
 	# remap every chunk

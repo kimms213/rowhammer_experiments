@@ -90,7 +90,7 @@ class AddressChunk():
 				array_index = error_info[3]
 				# remapping the row index
 				error_info[0] = remap_params[row_index * PARAMS['chip_num'] + chip_index]
-				error_info[0] = remap_params[error_info[0] * PARAMS['chip_num'] + array_index]
+				#error_info[0] = remap_params[error_info[0] * PARAMS['chip_num'] + array_index]
 
 
 class ChunkList():
