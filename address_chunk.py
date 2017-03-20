@@ -59,7 +59,7 @@ class AddressChunk():
 
 	def get_double_error_in_word(self):
 		error_list = []
-		for unit_index in range(len(self.__remapped_error_list)):
+		for unit_index in range(len(self.__error_list)):
 			for word_index in range(PARAMS['unit_size'] / (PARAMS['chip_num'] * 8)):
 				for row_index in range(PARAMS['chunk_size']):
 					error_in_word = self.get_error_in_word(row_index, unit_index, word_index)
@@ -80,6 +80,17 @@ class AddressChunk():
 						error_hist[error_num] = 1
 		return error_hist
 
+	def get_remapped_double_error_in_word(self):
+		error_list = []
+		for unit_index in range(len(self.__remapped_error_list)):
+			for word_index in range(PARAMS['unit_size'] / (PARAMS['chip_num'] * 8)):
+				for row_index in range(PARAMS['chunk_size']):
+					error_in_word = self.get_remapped_error_in_word(row_index, unit_index, word_index)
+					error_num = len(error_in_word)
+					if error_num >= 2:
+						error_list.append(error_in_word)
+		return error_list
+
 	def remap(self, remap_params):
 		self.__remapped_error_list = deepcopy(self.__error_list)
 		for unit in self.__remapped_error_list:
@@ -91,6 +102,7 @@ class AddressChunk():
 				# remapping the row index
 				error_info[0] = remap_params[row_index * PARAMS['chip_num'] + chip_index]
 				#error_info[0] = remap_params[error_info[0] * PARAMS['chip_num'] + array_index]
+				# array swizzle
 
 
 class ChunkList():
@@ -133,7 +145,7 @@ class ChunkList():
 	def get_double_error_in_word(self):
 		error_list = []
 		for chunk in self.__chunk_list:
-			error_list += chunk.get_double_error_in_word()
+			error_list.append(chunk.get_double_error_in_word())
 		return error_list
 
 	def get_remapped_error_in_word_hist(self):
@@ -145,3 +157,9 @@ class ChunkList():
 				else:
 					error_hist[error_num]  = freq
 		return error_hist
+
+	def get_remapped_double_error_in_word(self):
+		error_list = []
+		for chunk in self.__chunk_list:
+			error_list.append(chunk.get_remapped_double_error_in_word())
+		return error_list

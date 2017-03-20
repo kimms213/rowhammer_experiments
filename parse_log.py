@@ -9,7 +9,8 @@ from mapper import Mapper
 # main function
 if __name__ == "__main__":
 	# read log and create error_dict
-	error_dict = read_log('log_files/log_samsung_2G_1600_A_modi_print_new_170313_test7')
+	#error_dict = read_log('log_files/log_kingmax_2G_1600_modi_print_new_170315_2')
+	error_dict = read_log('log_files/log_samsung_2G_1600_B_modi_print_new_170317_2')
 	# get number of rows in log
 	max_row_num = max(error_dict.keys())
 	print max_row_num
@@ -20,12 +21,29 @@ if __name__ == "__main__":
 
 	# create mapper
 	mapper = Mapper(PARAMS['chip_num'], PARAMS['chunk_size'])
-	mapper.set_params_from_csv('mapping_files/proposed_ver2.map')
+	mapper.set_params_from_csv('mapping_files/patent.map')
 	print mapper.verify()
 
 	# remap every chunk
 	chunk_list.remap(mapper)
 
+	# print double error
+	for errors in chunk_list.get_double_error_in_word():
+		if len(errors) == 0:
+			continue
+		print errors
+
+	print "-------------------------------------------"
+	for errors in chunk_list.get_remapped_double_error_in_word():
+		if len(errors) == 0:
+			continue
+		print errors
+
 	# get error histogram
-	print chunk_list.get_error_in_word_hist()
-	print chunk_list.get_remapped_error_in_word_hist()
+	print "Patent"
+	#print "proposed_ver7"
+	#print "Array Swizzle"
+	print "Samsung_B"
+	#print chunk_list.get_error_in_word_hist()
+	#print chunk_list.get_remapped_error_in_word_hist()
+	
