@@ -17,6 +17,8 @@ class Mapper():
 					self.__remap_params.append(int(param))
 				#params_list = map(lambda x: int(x), line)
 				#self.__remap_params.append(params_list)
+		if len(self.__remap_params) != self.__chunk_size * self.__chip_num:
+			raise Exception("csv file does not match with chunk size")
 
 	def set_params_from_list(self, params_list):
 		self.__remap_params = params_list

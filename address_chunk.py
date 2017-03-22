@@ -42,8 +42,14 @@ class AddressChunk():
 	def get_error_in_word(self, row_index, unit_index, word_index):
 		return filter(lambda x: x[0]==row_index and x[2] == word_index, self.get_error_in_unit(unit_index))
 
+	def get_error_in_byte(self, row_index, unit_index, chip_index, word_index):
+		return filter(lambda x: x[0]==row_index and x[1]==chip_index and x[2] == word_index, self.get_error_in_unit(unit_index))
+
 	def get_remapped_error_in_word(self, row_index, unit_index, word_index):
-		return filter(lambda x: x[0]==row_index and x[2] == word_index, self.get_remapped_error_in_unit(unit_index))		
+		return filter(lambda x: x[0]==row_index and x[2] == word_index, self.get_remapped_error_in_unit(unit_index))
+
+	def get_remapped_error_in_byte(self, row_index, unit_index, chip_index, word_index):
+		return filter(lambda x: x[0]==row_index and x[1]==chip_index and x[2] == word_index, self.get_remapped_error_in_unit(unit_index))
 
 	def get_error_in_word_hist(self):
 		error_hist = {}
@@ -66,6 +72,18 @@ class AddressChunk():
 					error_num = len(error_in_word)
 					if error_num >= 2:
 						error_list.append(error_in_word)
+		return error_list
+
+	def get_double_error_in_byte(self):
+		error_list = []
+		for unit_index in range(len(self.__error_list)):
+			for word_index in range(PARAMS['unit_size'] / (PARAMS['chip_num'] * 8)):
+				for row_index in range(PARAMS['chunk_size']):
+					for chip_index in range(PARAMS['chip_num']):
+						error_in_word = self.get_error_in_byte(row_index, unit_index, chip_index, word_index)
+						error_num = len(error_in_word)
+						if error_num >= 2:
+							error_list.append(error_in_word)
 		return error_list
 
 	def get_remapped_error_in_word_hist(self):
@@ -91,17 +109,32 @@ class AddressChunk():
 						error_list.append(error_in_word)
 		return error_list
 
+	def get_remapped_double_error_in_byte(self):
+		error_list = []
+		for unit_index in range(len(self.__remapped_error_list)):
+			for word_index in range(PARAMS['unit_size'] / (PARAMS['chip_num'] * 8)):
+				for row_index in range(PARAMS['chunk_size']):
+					for chip_index in range(PARAMS['chip_num']):
+						error_in_word = self.get_remapped_error_in_byte(row_index, unit_index, chip_index, word_index)
+						error_num = len(error_in_word)
+						if error_num >= 2:
+							error_list.append(error_in_word)
+		return error_list
+
 	def remap(self, remap_params):
 		self.__remapped_error_list = deepcopy(self.__error_list)
 		for unit in self.__remapped_error_list:
 			for error_info in unit:
 				row_index   = error_info[0]
 				chip_index  = error_info[1]
-				#word_index  = error_info[2]
-				array_index = error_info[3]
+				word_index  = error_info[2]
+				bit_index = error_info[3]
 				# remapping the row index
 				error_info[0] = remap_params[row_index * PARAMS['chip_num'] + chip_index]
-				#error_info[0] = remap_params[error_info[0] * PARAMS['chip_num'] + array_index]
+				# second level remap
+				#array_index_remapped = remap_params[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
+				#error_info[1] = array_index_remapped % PARAMS['chip_num']
+				#error_info[2] = array_index_remapped / PARAMS['chip_num']
 				# array swizzle
 
 
@@ -148,6 +181,12 @@ class ChunkList():
 			error_list.append(chunk.get_double_error_in_word())
 		return error_list
 
+	def get_double_error_in_byte(self):
+		error_list = []
+		for chunk in self.__chunk_list:
+			error_list.append(chunk.get_double_error_in_byte())
+		return error_list
+
 	def get_remapped_error_in_word_hist(self):
 		error_hist = {}
 		for chunk in self.__chunk_list:
@@ -162,4 +201,10 @@ class ChunkList():
 		error_list = []
 		for chunk in self.__chunk_list:
 			error_list.append(chunk.get_remapped_double_error_in_word())
+		return error_list
+
+	def get_remapped_double_error_in_byte(self):
+		error_list = []
+		for chunk in self.__chunk_list:
+			error_list.append(chunk.get_remapped_double_error_in_byte())
 		return error_list
