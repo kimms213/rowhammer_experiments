@@ -8,7 +8,7 @@ PARAMS = {
 	# unit paramaters 
 	'unit_size' : 2 ** 9,
 	# chunk parameters
-	'chunk_size': 32
+	'chunk_size': 64
 }
 
 def unit_num_per_row(params):

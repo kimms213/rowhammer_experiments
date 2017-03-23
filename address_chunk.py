@@ -121,7 +121,7 @@ class AddressChunk():
 							error_list.append(error_in_word)
 		return error_list
 
-	def remap(self, remap_params):
+	def remap(self, remap_params_row):
 		self.__remapped_error_list = deepcopy(self.__error_list)
 		for unit in self.__remapped_error_list:
 			for error_info in unit:
@@ -129,13 +129,36 @@ class AddressChunk():
 				chip_index  = error_info[1]
 				word_index  = error_info[2]
 				bit_index = error_info[3]
-				# remapping the row index
-				error_info[0] = remap_params[row_index * PARAMS['chip_num'] + chip_index]
-				# second level remap
-				#array_index_remapped = remap_params[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
+
+				# First level remap (remapping the row index)
+				error_info[0] = remap_params_row[row_index * PARAMS['chip_num'] + chip_index]
+				# second level remap (bit swizzle)
+				#array_index_remapped = remap_params_[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
 				#error_info[1] = array_index_remapped % PARAMS['chip_num']
 				#error_info[2] = array_index_remapped / PARAMS['chip_num']
-				# array swizzle
+
+
+	def remap_more(self, remap_params_row, remap_params_bit):
+		self.__remapped_error_list = deepcopy(self.__error_list)
+		for unit in self.__remapped_error_list:
+			for error_info in unit:
+				row_index   = error_info[0]
+				chip_index  = error_info[1]
+				word_index  = error_info[2]
+				bit_index = error_info[3]
+
+				# First level remap (remapping the row index)
+				error_info[0] = remap_params_row[row_index * PARAMS['chip_num'] + chip_index]
+				
+				# second level remap (array swizzle)
+				array_index_remapped = remap_params_bit[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
+				error_info[1] = array_index_remapped % PARAMS['chip_num']
+				error_info[2] = array_index_remapped / PARAMS['chip_num']
+				chip_index_bit = error_info[1]
+				word_index_bit = error_info[2]
+				# third level remap (remap row 1 more time)
+				#error_info[0] = remap_params_row[(word_index_bit * PARAMS['chip_num'] + chip_index_bit) * PARAMS['chip_num'] + bit_index]
+
 
 
 class ChunkList():
@@ -157,13 +180,26 @@ class ChunkList():
 		'''
 		if mapper.verify():
 			for chunk in self.__chunk_list:
-				chunk.remap(mapper.get_remap_params())
+				chunk.remap(mapper.get_remap_params_row())
 		else:
 			raise Exception('mapper is not verified')
 		'''
 		# for test, enable remap without verification
 		for chunk in self.__chunk_list:
-			chunk.remap(mapper.get_remap_params())
+			chunk.remap(mapper.get_remap_params_row())
+
+	def remap_more(self, mapper, mapper_bit):
+		# verify mapper
+		'''
+		if mapper.verify():
+			for chunk in self.__chunk_list:
+				chunk.remap(mapper.get_remap_params_row())
+		else:
+			raise Exception('mapper is not verified')
+		'''
+		# for test, enable remap without verification
+		for chunk in self.__chunk_list:
+			chunk.remap_more(mapper.get_remap_params_row(),mapper_bit.get_remap_params_row())
 
 	def get_error_in_word_hist(self):
 		error_hist = {}
