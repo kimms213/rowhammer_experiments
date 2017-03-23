@@ -10,7 +10,7 @@ from mapper import Mapper
 if __name__ == "__main__":
 	# read log and create error_dict
 	#error_dict = read_log('log_files/log_kingmax_2G_1600_modi_print_new_170315_2')
-	error_dict = read_log('log_files/log_samsung_2G_1600_B_modi_print_new_170317_2')
+	error_dict = read_log('log_files/log_samsung_4G_1333_A_modi_print_new_170322 (3)')
 	# get number of rows in log
 	max_row_num = max(error_dict.keys())
 	print max_row_num
@@ -22,43 +22,51 @@ if __name__ == "__main__":
 	# create mapper
 	mapper = Mapper(PARAMS['chip_num'], PARAMS['chunk_size'])
 	mapper_bit = Mapper(PARAMS['chip_num'], PARAMS['chunk_size'])
-	mapper.set_params_from_csv('mapping_files/proposed_64_12.map')
-	mapper_bit.set_params_from_csv('mapping_files/proposed_64_12.map')
+	mapper.set_params_from_csv('mapping_files/proposed_64_3.map')
+	mapper_bit.set_params_from_csv('mapping_files/proposed_64_6.map')
 	print mapper.verify()
 
 	# remap every chunk
-	#chunk_list.remap(mapper)
+	chunk_list.remap(mapper)
 
 	# remap every chunk for double or triple remapping (your choice!)
-	chunk_list.remap_more(mapper, mapper_bit)
+	#chunk_list.remap_more(mapper, mapper_bit)
 	'''
-	same_count = 0
+	same_unit_count = 0
+	same_row_count = 0
 	# print double error
 	for errors in chunk_list.get_double_error_in_byte():
 		if len(errors) == 0:
 			continue
-		same_count += 1
-		print errors
-	print same_count
+		same_unit_count += len(errors)
+		same_row_count += 1
+		#print errors
+	print same_row_count
+	print same_unit_count
 	print "-------------------------------------------"
 	'''
-	same_count = 0
+	same_unit_count = 0
+	same_row_count = 0
 	for errors in chunk_list.get_remapped_double_error_in_byte():
 		if len(errors) == 0:
 			continue
-		same_count += 1
-		print errors
+		same_unit_count += len(errors)
+		same_row_count += 1
+		#print errors
 	
-	print same_count
+	print same_row_count
+	print same_unit_count
 	
 
 	# get error histogram
-	print "Proposed_64_12"
-	print "Array : proposed_64_12"
+	print "Proposed_64_3"
+	#print "Array : proposed_64_6"
+	#print "double swizzle"
+	#print "triple swizzle"
 	print "Chunk size : ",PARAMS["chunk_size"]
 	#print "Row + Array swizzle"
 	#print "Row + Array + Row swizzle"
-	print "Samsung_2G_B"
+	print "Samsung_4G_1333_A (3)"
 	#print "Samsung2G_B"
 	print chunk_list.get_error_in_word_hist()
 	print chunk_list.get_remapped_error_in_word_hist()

@@ -132,12 +132,8 @@ class AddressChunk():
 
 				# First level remap (remapping the row index)
 				error_info[0] = remap_params_row[row_index * PARAMS['chip_num'] + chip_index]
-				# second level remap (bit swizzle)
-				#array_index_remapped = remap_params_[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
-				#error_info[1] = array_index_remapped % PARAMS['chip_num']
-				#error_info[2] = array_index_remapped / PARAMS['chip_num']
 
-
+	# for double(or triple) remapping 
 	def remap_more(self, remap_params_row, remap_params_bit):
 		self.__remapped_error_list = deepcopy(self.__error_list)
 		for unit in self.__remapped_error_list:
@@ -150,14 +146,25 @@ class AddressChunk():
 				# First level remap (remapping the row index)
 				error_info[0] = remap_params_row[row_index * PARAMS['chip_num'] + chip_index]
 				
-				# second level remap (array swizzle)
-				array_index_remapped = remap_params_bit[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
-				error_info[1] = array_index_remapped % PARAMS['chip_num']
-				error_info[2] = array_index_remapped / PARAMS['chip_num']
-				chip_index_bit = error_info[1]
-				word_index_bit = error_info[2]
+				# second level remap method 1 (array swizzle)
+				#array_index_remapped = remap_params_bit[(word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index]
+				#error_info[1] = array_index_remapped % PARAMS['chip_num']
+				#error_info[2] = array_index_remapped / PARAMS['chip_num']
+				#chip_index_bit = error_info[1]
+				#word_index_bit = error_info[2]
+
+				# second level remap method 2 : just push 4 to left (bits)
+				bit_index_origin = (word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index
+				bit_index_remapped = (bit_index_origin + 4) % 512
+				byte_index_remapped = bit_index_remapped / PARAMS['chip_num']
+				error_info[1] = byte_index_remapped % PARAMS['chip_num']
+				error_info[2] = byte_index_remapped / PARAMS['chip_num']
+				chip_index_bit = error_info[1]  
+				word_index_bit = error_info[2]  
+				
 				# third level remap (remap row 1 more time)
-				#error_info[0] = remap_params_row[(word_index_bit * PARAMS['chip_num'] + chip_index_bit) * PARAMS['chip_num'] + bit_index]
+				row_index_bit = error_info[0]
+				error_info[0] = remap_params_row[row_index_bit * PARAMS['chip_num'] + chip_index_bit]
 
 
 
