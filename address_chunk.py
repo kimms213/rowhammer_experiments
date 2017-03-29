@@ -1,5 +1,7 @@
 from copy import deepcopy
 from operator import add
+import numpy as np
+np.set_printoptions(threshold=np.inf)
 
 # import user modules
 from utils import PARAMS
@@ -50,6 +52,21 @@ class AddressChunk():
 
 	def get_remapped_error_in_byte(self, row_index, unit_index, chip_index, word_index):
 		return filter(lambda x: x[0]==row_index and x[1]==chip_index and x[2] == word_index, self.get_remapped_error_in_unit(unit_index))
+
+	def get_error_hist_by_unit(self):
+		error_hist = []
+		for unit_index in range(len(self.__error_list)):
+			error_hist.append(len(self.__error_list[unit_index]))
+		return error_hist
+
+	def get_error_hist_by_chip_unit(self):
+		error_hist = []
+		for unit_index in range(PARAMS['unit_num']):
+			error_hist_chip = []
+			for chip_index in range(PARAMS['chip_num']):
+				error_hist_chip.append(len(filter(lambda x: x[1]==chip_index, self.get_error_in_unit(unit_index))))
+			error_hist.append(error_hist_chip)
+		return error_hist
 
 	def get_error_in_word_hist(self):
 		error_hist = {}
@@ -155,7 +172,7 @@ class AddressChunk():
 
 				# second level remap method 2 : just push 4 to left (bits)
 				bit_index_origin = (word_index * PARAMS['chip_num'] + chip_index) * PARAMS['chip_num'] + bit_index
-				bit_index_remapped = (bit_index_origin + 4) % 512
+				bit_index_remapped = (bit_index_origin + 0) % 512
 				byte_index_remapped = bit_index_remapped / PARAMS['chip_num']
 				error_info[1] = byte_index_remapped % PARAMS['chip_num']
 				error_info[2] = byte_index_remapped / PARAMS['chip_num']
@@ -165,6 +182,11 @@ class AddressChunk():
 				# third level remap (remap row 1 more time)
 				row_index_bit = error_info[0]
 				error_info[0] = remap_params_row[row_index_bit * PARAMS['chip_num'] + chip_index_bit]
+
+	'''
+	def remap_more_unit(self, mapper_unit, mapper, mapper_bit):
+		self.__remapped_error_list = deepcopy(self.__error_list)
+	'''
 
 
 
@@ -207,6 +229,29 @@ class ChunkList():
 		# for test, enable remap without verification
 		for chunk in self.__chunk_list:
 			chunk.remap_more(mapper.get_remap_params_row(),mapper_bit.get_remap_params_row())
+
+	'''
+	def remap_more_unit(self, mapper_unit, mapper, mapper_bit):
+		for chunk in self.__chunk_list:
+			chunk.remap_more_unit(mapper_unit.get_remap_params_row(), mapper.get_remap_params_row(),mapper_bit.get_remap_params_row())
+	'''
+
+	def get_error_hist_by_unit(self):
+		error_hist = np.zeros((PARAMS['unit_num'],), dtype=np.int)
+		for chunk in self.__chunk_list:
+			error_hist_chunk = chunk.get_error_hist_by_unit()
+			for unit_index in range(len(chunk.get_error())):
+				error_hist[unit_index] += error_hist_chunk[unit_index]
+		return error_hist
+
+	def get_error_hist_by_chip_unit(self):
+		error_hist = np.zeros((PARAMS['unit_num'], PARAMS['chip_num']), dtype=np.int)
+		for chunk in self.__chunk_list:
+			error_hist_chunk = chunk.get_error_hist_by_chip_unit()
+			for unit_index in range(PARAMS['unit_num']):
+				for chip_index in range(PARAMS['chip_num']):
+					error_hist[unit_index][chip_index] += error_hist_chunk[unit_index][chip_index]
+		return error_hist
 
 	def get_error_in_word_hist(self):
 		error_hist = {}
